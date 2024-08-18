@@ -2,12 +2,15 @@ using UnityEngine;
 
 public class AutomataManager : MonoBehaviour
 {
+    // References
     public Cell prefabCell;
     public Material aliveMaterial, deadMaterial;
 
+    // Grid size
     public int horizontalSize = 50;
     public int verticalSize = 50;
 
+    // Grid
     public Cell[,] automataGrid;
 
     // Time tracking
@@ -37,8 +40,10 @@ public class AutomataManager : MonoBehaviour
 
     void SetupGrid()
     {
+        // Initialise the grid
         automataGrid = new Cell[horizontalSize, verticalSize];
 
+        // Add a Cell instance to every grid cell
         for(int x = 0; x < horizontalSize; x++)
         {
             for(int y = 0; y < verticalSize; y++)
@@ -67,11 +72,13 @@ public class AutomataManager : MonoBehaviour
                 
                 if(x == 0)
                 {
+                    // If the cell is on the left edge, set no left neighbour
                     left = null;
                     right = automataGrid[x+1, y];
                 }
                 else if(x == horizontalSize-1)
                 {
+                    // If the cell is on the right edge, set no right neighbour
                     left = automataGrid[x-1, y];
                     right = null;
                 }
@@ -83,11 +90,13 @@ public class AutomataManager : MonoBehaviour
 
                 if(y == 0)
                 {
+                    // If the cell is on the bottom edge, set no bottom neighbour
                     top = automataGrid[x, y+1];
                     bottom = null;
                 }
                 else if(y == verticalSize-1)
                 {
+                    // If the cell is on the top edge, set no top neighbour
                     top = null;
                     bottom = automataGrid[x, y-1];
                 }
@@ -97,6 +106,7 @@ public class AutomataManager : MonoBehaviour
                     bottom = automataGrid[x, y-1];
                 }
 
+                // Tell the cell its neighbours
                 currentCell.VonNeumannNeighbours(top, bottom, left, right);
             }
         }
