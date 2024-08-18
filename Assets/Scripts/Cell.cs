@@ -61,4 +61,22 @@ public class Cell : MonoBehaviour
     {
         changedState = false;
     }
+
+    public void GameOfLifeGeneration(int currentLiveNeighbours)
+    {
+        if(state == 1)
+        {
+            if(currentLiveNeighbours < 2 || currentLiveNeighbours > 3)
+            {
+                UpdateState(0);
+            }
+        }
+        else
+        {
+            if(currentLiveNeighbours == 3)
+            {
+                UpdateState(1);
+            }
+        }
+    }
 }
