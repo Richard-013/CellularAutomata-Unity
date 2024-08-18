@@ -10,6 +10,10 @@ public class AutomataManager : MonoBehaviour
 
     public Cell[,] automataGrid;
 
+    // Time tracking
+    private float time = 0.0f;
+    public float interpolationPeriod = 0.5f;
+
     void Awake()
     {
         SetupGrid();
@@ -19,9 +23,16 @@ public class AutomataManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        // Update how much time has passed since last frame
+        time += Time.deltaTime;
+
+        // If enough time has passed, update the grid
+        if (time >= interpolationPeriod)
+        {
+            time = time - interpolationPeriod;
             RandomiseState();
             UpdateMaterials();
+        }
     }
 
     void SetupGrid()
