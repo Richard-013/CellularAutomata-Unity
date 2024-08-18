@@ -52,7 +52,7 @@ public class AutomataManager : MonoBehaviour
         {
             for(int y = 0; y < verticalSize; y++)
             {
-                automataGrid[x, y] = Instantiate<Cell>(prefabCell);
+                automataGrid[x, y] = Instantiate<Cell>(prefabCell, this.transform);
             }
         }
 
