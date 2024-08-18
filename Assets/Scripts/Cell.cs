@@ -1,10 +1,9 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Cell : MonoBehaviour
 {
     // Coordinates of this cell
-    int cellX, cellY;
+    public int cellX, cellY;
 
     // 1 = Alive, 0 = Dead
     public int state = -1;
@@ -12,7 +11,8 @@ public class Cell : MonoBehaviour
     public bool changedState = true;
 
     // von Neumann Neighbours
-    Cell topNeighbour, bottomNeighbour, leftNeighbour, rightNeighbour;
+    // Indexes: 0 = Top, 1 = Bottom, 2 = Left, 3 = Right
+    public Cell[] neighbours;
 
     void Awake()
     {
@@ -33,10 +33,12 @@ public class Cell : MonoBehaviour
 
     public void VonNeumannNeighbours(Cell top, Cell bottom, Cell left, Cell right)
     {
-        topNeighbour = top;
-        bottomNeighbour = bottom;
-        leftNeighbour = left;
-        rightNeighbour = right;
+        neighbours = new Cell[4];
+
+        neighbours[0] = top;
+        neighbours[1] = bottom;
+        neighbours[2] = left;
+        neighbours[3] = right;
     }
 
     // Mark if the state changed in the last cycle
