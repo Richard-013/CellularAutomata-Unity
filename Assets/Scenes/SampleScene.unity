@@ -468,6 +468,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabCell: {fileID: 2995050202655426246, guid: 666be7c422c6e644c8ff1eb0e8972131, type: 3}
+  aliveMaterial: {fileID: 2100000, guid: f765806a76220544590821375c9e7bea, type: 2}
+  deadMaterial: {fileID: 2100000, guid: f2df123fb04d2b0488bb351b35e8c43d, type: 2}
   horizontalSize: 50
   verticalSize: 50
 --- !u!4 &1858791834
