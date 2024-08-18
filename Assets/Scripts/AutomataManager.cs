@@ -52,11 +52,11 @@ public class AutomataManager : MonoBehaviour
             }
         }
 
-        SetCellNeighbours();
+        SetupCell();
     }
 
-    // Set the neighbours of each Cell based on its position
-    void SetCellNeighbours()
+    // Set the properties of each Cell
+    void SetupCell()
     {
         for(int x = 0; x < horizontalSize; x++)
         {
@@ -68,6 +68,7 @@ public class AutomataManager : MonoBehaviour
                 currentCell.transform.position = new Vector3(x, y, 0);
                 currentCell.UpdateState(Random.Range(0,2));
 
+                // Set the neighbours of the cell based on its grid position
                 Cell top, bottom, left, right;
                 
                 if(x == 0)
