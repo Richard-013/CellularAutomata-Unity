@@ -13,6 +13,9 @@ public class AutomataManager : MonoBehaviour
     // Grid
     public Cell[,] automataGrid;
 
+    // Shadow Grid of current states
+    public int[,] shadowGrid;
+
     // Time tracking
     private float time = 0.0f;
     public float interpolationPeriod = 0.5f;
@@ -42,6 +45,7 @@ public class AutomataManager : MonoBehaviour
     {
         // Initialise the grid
         automataGrid = new Cell[horizontalSize, verticalSize];
+        shadowGrid = new int[horizontalSize, verticalSize];
 
         // Add a Cell instance to every grid cell
         for(int x = 0; x < horizontalSize; x++)
@@ -66,7 +70,9 @@ public class AutomataManager : MonoBehaviour
                 currentCell.name = "Cell " + x + ", " + y;
                 currentCell.SetCoords(x, y);
                 currentCell.transform.position = new Vector3(x, y, 0);
-                currentCell.UpdateState(Random.Range(0,2));
+                int newState = Random.Range(0,2);
+                currentCell.UpdateState(newState);
+                shadowGrid[x, y] = newState;
 
                 // Set the neighbours of the cell based on its grid position
                 Cell top, bottom, left, right;
@@ -120,7 +126,9 @@ public class AutomataManager : MonoBehaviour
         {
             for(int y = 0; y < verticalSize; y++)
             {
-                automataGrid[x, y].UpdateState(Random.Range(0,2));
+                int newState = Random.Range(0,2);
+                automataGrid[x, y].UpdateState(newState);
+                shadowGrid[x, y] = newState;
             }
         }
     }
