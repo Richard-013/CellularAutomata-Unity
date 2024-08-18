@@ -36,8 +36,7 @@ public class AutomataManager : MonoBehaviour
         if (time >= interpolationPeriod)
         {
             time = time - interpolationPeriod;
-            RandomiseState();
-            UpdateMaterials();
+            RunGameOfLifeGeneration();
         }
     }
 
@@ -159,5 +158,46 @@ public class AutomataManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    void RunGameOfLifeGeneration()
+    {
+        for(int x = 0; x < horizontalSize; x++)
+        {
+            for(int y = 0; y < verticalSize; y++)
+            {
+                Cell currentCell = automataGrid[x, y];
+
+                currentCell.GameOfLifeGeneration(TotalLiveNeighbours(currentCell));
+            }
+        }
+
+        for(int x = 0; x < horizontalSize; x++)
+        {
+            for(int y = 0; y < verticalSize; y++)
+            {
+                shadowGrid[x, y] = automataGrid[x, y].state;
+            }
+        }
+
+        UpdateMaterials();
+    }
+
+    int TotalLiveNeighbours(Cell currentCell)
+    {
+        int liveNeighbours = 0;
+
+        for(int i = 0; i < 4; i++)
+        {
+            if(currentCell.neighbours[i] != null)
+            {
+                if(shadowGrid[currentCell.neighbours[i].cellX, currentCell.neighbours[i].cellY] == 1)
+                {
+                    liveNeighbours++;
+                }
+            }
+        }
+
+        return liveNeighbours;
     }
 }
