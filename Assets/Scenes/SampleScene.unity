@@ -438,11 +438,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8c54ddb8da325b498a8d4a6bd61d642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellX: 0
-  cellY: 0
   state: 1
   changedState: 0
-  neighbours: []
 --- !u!1 &1858791832
 GameObject:
   m_ObjectHideFlags: 0
@@ -477,7 +474,7 @@ MonoBehaviour:
   deadMaterial: {fileID: 2100000, guid: f2df123fb04d2b0488bb351b35e8c43d, type: 2}
   horizontalSize: 308
   verticalSize: 200
-  interpolationPeriod: 0.3
+  interpolationPeriod: 0.1
 --- !u!4 &1858791834
 Transform:
   m_ObjectHideFlags: 0
