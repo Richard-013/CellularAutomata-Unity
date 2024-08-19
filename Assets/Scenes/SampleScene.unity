@@ -477,7 +477,7 @@ MonoBehaviour:
   deadMaterial: {fileID: 2100000, guid: f2df123fb04d2b0488bb351b35e8c43d, type: 2}
   horizontalSize: 308
   verticalSize: 200
-  interpolationPeriod: 0.75
+  interpolationPeriod: 0.3
 --- !u!4 &1858791834
 Transform:
   m_ObjectHideFlags: 0
