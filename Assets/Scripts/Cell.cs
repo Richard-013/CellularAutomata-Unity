@@ -12,6 +12,7 @@ public class Cell : MonoBehaviour
 
     // von Neumann Neighbours
     // Indexes: 0 = Top, 1 = Bottom, 2 = Left, 3 = Right
+    // 4 = TopLeft, 5 = TopRight, 6 = BottomLeft, 7 = BottomRight 
     public Cell[] neighbours;
 
     void Awake()
@@ -39,6 +40,20 @@ public class Cell : MonoBehaviour
         neighbours[1] = bottom;
         neighbours[2] = left;
         neighbours[3] = right;
+    }
+
+    public void MooreNeighbours(Cell top, Cell bottom, Cell left, Cell right, Cell topLeft, Cell topRight, Cell bottomLeft, Cell bottomRight)
+    {
+        neighbours = new Cell[8];
+
+        neighbours[0] = top;
+        neighbours[1] = bottom;
+        neighbours[2] = left;
+        neighbours[3] = right;
+        neighbours[4] = topLeft;
+        neighbours[5] = topRight;
+        neighbours[6] = bottomLeft;
+        neighbours[7] = bottomRight;
     }
 
     // Mark if the state changed in the last cycle
