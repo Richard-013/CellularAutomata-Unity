@@ -2,9 +2,6 @@ using UnityEngine;
 
 public class Cell : MonoBehaviour
 {
-    // Coordinates of this cell
-    public int cellX, cellY;
-
     // 1 = Alive, 0 = Dead
     public int state = -1;
 
@@ -13,7 +10,7 @@ public class Cell : MonoBehaviour
     // von Neumann Neighbours
     // Indexes: 0 = Top, 1 = Bottom, 2 = Left, 3 = Right
     // 4 = TopLeft, 5 = TopRight, 6 = BottomLeft, 7 = BottomRight 
-    public Cell[] neighbours;
+    public int[][] neighbours;
 
     void Awake()
     {
@@ -26,15 +23,9 @@ public class Cell : MonoBehaviour
         
     }
 
-    public void SetCoords(int x, int y)
+    public void VonNeumannNeighbours(int[] top, int[] bottom, int[] left, int[] right)
     {
-        cellX = x;
-        cellY = y;
-    }
-
-    public void VonNeumannNeighbours(Cell top, Cell bottom, Cell left, Cell right)
-    {
-        neighbours = new Cell[4];
+        neighbours = new int[4][];
 
         neighbours[0] = top;
         neighbours[1] = bottom;
@@ -42,9 +33,9 @@ public class Cell : MonoBehaviour
         neighbours[3] = right;
     }
 
-    public void MooreNeighbours(Cell top, Cell bottom, Cell left, Cell right, Cell topLeft, Cell topRight, Cell bottomLeft, Cell bottomRight)
+    public void MooreNeighbours(int[] top, int[] bottom, int[] left, int[] right, int[] topLeft, int[] topRight, int[] bottomLeft, int[] bottomRight)
     {
-        neighbours = new Cell[8];
+        neighbours = new int[8][];
 
         neighbours[0] = top;
         neighbours[1] = bottom;
