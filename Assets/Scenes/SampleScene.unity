@@ -205,7 +205,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 91, y: 59, z: -110}
+  m_LocalPosition: {x: 154, y: 100, z: -180}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -475,9 +475,9 @@ MonoBehaviour:
   prefabCell: {fileID: 2995050202655426246, guid: 666be7c422c6e644c8ff1eb0e8972131, type: 3}
   aliveMaterial: {fileID: 2100000, guid: f765806a76220544590821375c9e7bea, type: 2}
   deadMaterial: {fileID: 2100000, guid: f2df123fb04d2b0488bb351b35e8c43d, type: 2}
-  horizontalSize: 185
-  verticalSize: 120
-  interpolationPeriod: 0.5
+  horizontalSize: 308
+  verticalSize: 200
+  interpolationPeriod: 1
 --- !u!4 &1858791834
 Transform:
   m_ObjectHideFlags: 0
