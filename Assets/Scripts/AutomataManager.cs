@@ -20,8 +20,16 @@ public class AutomataManager : MonoBehaviour
     private float time = 0.0f;
     public float interpolationPeriod = 0.5f;
 
+    const int VON_NEUMANN_NEIGHBOURS = 4;
+    const int MOORE_NEIGHBOURS = 8;
+
+    bool enableMooreMode = false;
+    int numNeighbours;
+
     void Awake()
     {
+        enableMooreMode = true;
+        SetNeighbourMode();
         SetupGrid();
         UpdateMaterials();
     }
@@ -37,6 +45,18 @@ public class AutomataManager : MonoBehaviour
         {
             time = time - interpolationPeriod;
             RunGameOfLifeGeneration();
+        }
+    }
+
+    void SetNeighbourMode()
+    {
+        if(enableMooreMode)
+        {
+            numNeighbours = MOORE_NEIGHBOURS;
+        }
+        else
+        {
+            numNeighbours = VON_NEUMANN_NEIGHBOURS;
         }
     }
 
@@ -73,48 +93,184 @@ public class AutomataManager : MonoBehaviour
                 currentCell.UpdateState(newState);
                 shadowGrid[x, y] = newState;
 
-                // Set the neighbours of the cell based on its grid position
-                Cell top, bottom, left, right;
-                
-                if(x == 0)
-                {
-                    // If the cell is on the left edge, set no left neighbour
-                    left = null;
-                    right = automataGrid[x+1, y];
-                }
-                else if(x == horizontalSize-1)
-                {
-                    // If the cell is on the right edge, set no right neighbour
-                    left = automataGrid[x-1, y];
-                    right = null;
-                }
-                else
-                {
-                    left = automataGrid[x-1, y];
-                    right = automataGrid[x+1, y];
-                }
+                SetupCellNeighbours(currentCell, x, y);
+            }
+        }
+    }
+
+    void SetupCellNeighbours(Cell currentCell, int x, int y)
+    {
+        if(enableMooreMode)
+        {
+            // Set the neighbours of the cell based on its grid position
+            Cell top, bottom, left, right, topLeft, topRight, bottomLeft, bottomRight;
+            
+            if(x == 0)
+            {
+                // If the cell is on the left edge, set no left neighbour
+                left = null;
+                right = automataGrid[x+1, y];
 
                 if(y == 0)
                 {
-                    // If the cell is on the bottom edge, set no bottom neighbour
+                    // If the cell is on the bottom edge, set no bottom neighbours
                     top = automataGrid[x, y+1];
                     bottom = null;
+
+                    topLeft = null;
+                    bottomLeft = null;
+                    bottomRight = null;
+                    topRight = automataGrid[x+1, y+1];
                 }
                 else if(y == verticalSize-1)
                 {
-                    // If the cell is on the top edge, set no top neighbour
+                    // If the cell is on the top edge, set no top neighbours
                     top = null;
                     bottom = automataGrid[x, y-1];
+
+                    topLeft = null;
+                    bottomLeft = null;
+                    bottomRight = automataGrid[x+1, y-1];
+                    topRight = null;
                 }
                 else
                 {
+                    // Set remaining neighbours
                     top = automataGrid[x, y+1];
                     bottom = automataGrid[x, y-1];
-                }
 
-                // Tell the cell its neighbours
-                currentCell.VonNeumannNeighbours(top, bottom, left, right);
+                    topLeft = null;
+                    bottomLeft = null;
+                    bottomRight = automataGrid[x+1, y-1];
+                    topRight = automataGrid[x+1, y+1];
+                }
             }
+            else if(x == horizontalSize-1)
+            {
+                // If the cell is on the right edge, set no right neighbour
+                left = automataGrid[x-1, y];
+                right = null;
+
+                if(y == 0)
+                {
+                    // If the cell is on the bottom edge, set no bottom neighbours
+                    top = automataGrid[x, y+1];
+                    bottom = null;
+
+                    topLeft = automataGrid[x-1, y+1];
+                    bottomLeft = null;
+                    bottomRight = null;
+                    topRight = null;
+                }
+                else if(y == verticalSize-1)
+                {
+                    // If the cell is on the top edge, set no top neighbours
+                    top = null;
+                    bottom = automataGrid[x, y-1];
+
+                    topLeft = null;
+                    bottomLeft = automataGrid[x-1, y-1];
+                    bottomRight = null;
+                    topRight = null;
+                }
+                else
+                {
+                    // Set remaining neighbours
+                    top = automataGrid[x, y+1];
+                    bottom = automataGrid[x, y-1];
+
+                    topLeft = automataGrid[x-1, y+1];
+                    bottomLeft = automataGrid[x-1, y-1];
+                    bottomRight = null;
+                    topRight = null;
+                }
+            }
+            else
+            {
+                left = automataGrid[x-1, y];
+                right = automataGrid[x+1, y];
+
+                if(y == 0)
+                {
+                    // If the cell is on the bottom edge, set no bottom neighbours
+                    top = automataGrid[x, y+1];
+                    bottom = null;
+                    
+                    topLeft = automataGrid[x-1, y+1];
+                    bottomLeft = null;
+                    bottomRight = null;
+                    topRight = automataGrid[x+1, y+1];
+                }
+                else if(y == verticalSize-1)
+                {
+                    // If the cell is on the top edge, set no top neighbours
+                    top = null;
+                    bottom = automataGrid[x, y-1];
+
+                    topLeft = null;
+                    bottomLeft = automataGrid[x-1, y-1];
+                    bottomRight = automataGrid[x+1, y-1];
+                    topRight = null;
+                }
+                else
+                {
+                    // Set remaining neighbours
+                    top = automataGrid[x, y+1];
+                    bottom = automataGrid[x, y-1];
+                    
+                    topLeft = automataGrid[x-1, y+1];
+                    bottomLeft = automataGrid[x-1, y-1];
+                    bottomRight = automataGrid[x+1, y-1];
+                    topRight = automataGrid[x+1, y+1];
+                }
+            }
+
+            // Tell the cell its neighbours
+            currentCell.MooreNeighbours(top, bottom, left, right, topLeft, topRight, bottomLeft, bottomRight);
+        }
+        else
+        {
+            // Set the neighbours of the cell based on its grid position
+            Cell top, bottom, left, right;
+            
+            if(x == 0)
+            {
+                // If the cell is on the left edge, set no left neighbour
+                left = null;
+                right = automataGrid[x+1, y];
+            }
+            else if(x == horizontalSize-1)
+            {
+                // If the cell is on the right edge, set no right neighbour
+                left = automataGrid[x-1, y];
+                right = null;
+            }
+            else
+            {
+                left = automataGrid[x-1, y];
+                right = automataGrid[x+1, y];
+            }
+
+            if(y == 0)
+            {
+                // If the cell is on the bottom edge, set no bottom neighbour
+                top = automataGrid[x, y+1];
+                bottom = null;
+            }
+            else if(y == verticalSize-1)
+            {
+                // If the cell is on the top edge, set no top neighbour
+                top = null;
+                bottom = automataGrid[x, y-1];
+            }
+            else
+            {
+                top = automataGrid[x, y+1];
+                bottom = automataGrid[x, y-1];
+            }
+
+            // Tell the cell its neighbours
+            currentCell.VonNeumannNeighbours(top, bottom, left, right);
         }
     }
 
@@ -187,7 +343,7 @@ public class AutomataManager : MonoBehaviour
     {
         int liveNeighbours = 0;
 
-        for(int i = 0; i < 4; i++)
+        for(int i = 0; i < numNeighbours; i++)
         {
             if(currentCell.neighbours[i] != null)
             {
