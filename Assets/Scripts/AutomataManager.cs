@@ -79,8 +79,8 @@ public class AutomataManager : MonoBehaviour
     {
         Color[] pixels = automatonTexture.GetPixels();
 
-        Color deadColour = new Color(0.1415f, 0.1415f, 0.1415f);
-        Color aliveColour = new Color(0.0745f, 0.3843f, 0.5372f);
+        Color deadColour = new Color(0.1415f, 0.1415f, 0.1415f, 1f);
+        Color aliveColour = new Color(0.0745f, 0.3843f, 0.5372f, 1f);
 
         for (int i = 0; i < pixels.Length; i++)
         {
