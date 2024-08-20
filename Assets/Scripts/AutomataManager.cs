@@ -28,12 +28,18 @@ public class AutomataManager : MonoBehaviour
 
     int generation = 0;
 
+    Texture2D automatonTexture;
+    public Material displayMaterial;
+
     void Awake()
     {
         enableMooreMode = true;
         SetNeighbourMode();
         SetupGrid();
-        UpdateMaterials();
+
+        SetupTexture();
+
+        //UpdateMaterials();
     }
 
     // Update is called once per frame
@@ -48,11 +54,52 @@ public class AutomataManager : MonoBehaviour
             time = time - interpolationPeriod;
             RunGameOfLifeGeneration();
             
+            /*
             if(generation % 10 == 0)
             {
                 UpdateMaterials();
             }
+            */
+            //UpdateMaterials();
+            UpdateTexture();
         }
+    }
+
+    void SetupTexture()
+    {
+        automatonTexture = new Texture2D(horizontalSize, verticalSize);
+        automatonTexture.filterMode = FilterMode.Point;
+
+        UpdateTexture();
+
+        displayMaterial.SetTexture("_BaseMap", automatonTexture);
+    }
+
+    void UpdateTexture()
+    {
+        Color[] pixels = automatonTexture.GetPixels();
+
+        Color deadColour = new Color(0.1415f, 0.1415f, 0.1415f);
+        Color aliveColour = new Color(0.0745f, 0.3843f, 0.5372f);
+
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            // Convert array index into X, Y then retrieve cell state
+            int state = shadowGrid[i % horizontalSize, i / verticalSize];
+            //Debug.Log("i: " + i + ", Co-Ordinates: " + (i % horizontalSize) + ", " + (i / verticalSize));
+
+            if(state == 0)
+            {
+                pixels[i] = deadColour;
+            }
+            else
+            {
+                pixels[i] = aliveColour;
+            }
+        }
+
+        automatonTexture.SetPixels(pixels);
+        automatonTexture.Apply();
     }
 
     void SetNeighbourMode()
@@ -94,7 +141,7 @@ public class AutomataManager : MonoBehaviour
             {
                 Cell currentCell = automataGrid[x, y];
                 currentCell.name = "Cell " + x + ", " + y;
-                currentCell.transform.position = new Vector3(x, y, 0);
+                currentCell.transform.position = new Vector3(x, y, -10);
                 int newState = Random.Range(0,2);
                 currentCell.UpdateState(newState);
                 shadowGrid[x, y] = newState;
