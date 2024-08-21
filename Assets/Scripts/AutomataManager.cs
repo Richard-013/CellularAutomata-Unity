@@ -7,7 +7,7 @@ public class AutomataManager : MonoBehaviour
     const int MOORE_NEIGHBOURS = 8;
 
     // Draw every n generations
-    const int GENERATION_DRAW_INTERVAL = 10;
+    const int GENERATION_DRAW_INTERVAL = 5;
 
     // Set in Editor
     public Material displayMaterial;
@@ -53,7 +53,8 @@ public class AutomataManager : MonoBehaviour
         if (time >= interpolationPeriod)
         {
             time = time - interpolationPeriod;
-            RunGameOfLifeGeneration();
+            GameOfLife.RunGameOfLifeGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
+            generation++;
             
             if(generation % GENERATION_DRAW_INTERVAL == 0)
             {
@@ -76,8 +77,8 @@ public class AutomataManager : MonoBehaviour
     {
         Color[] pixels = automatonTexture.GetPixels();
 
-        Color deadColour = new Color(0.1415f, 0.1415f, 0.1415f, 1f);
-        Color aliveColour = new Color(0.0745f, 0.3843f, 0.5372f, 1f);
+        Color deadColour = new Color(0.2415f, 0.2415f, 0.2415f, 1f);
+        Color aliveColour = new Color(0.3745f, 0.6843f, 0.8372f, 1f);
 
         for (int i = 0; i < pixels.Length; i++)
         {
@@ -339,15 +340,15 @@ public class AutomataManager : MonoBehaviour
         currentCell.MooreNeighbours(neighbours);
     } 
 
-    void RunGameOfLifeGeneration()
+    /*void RunGameOfLifeGeneration(Cell[,] automatonGrid, int[,] previousStates)
     {
         for(int x = 0; x < horizontalSize; x++)
         {
             for(int y = 0; y < verticalSize; y++)
             {
-                Cell currentCell = automataGrid[x, y];
+                Cell currentCell = automatonGrid[x, y];
 
-                currentCell.GameOfLifeGeneration(TotalLiveNeighbours(currentCell));
+                currentCell.GameOfLifeGeneration(TotalLiveNeighbours(currentCell, previousStates));
             }
         }
 
@@ -355,14 +356,12 @@ public class AutomataManager : MonoBehaviour
         {
             for(int y = 0; y < verticalSize; y++)
             {
-                shadowGrid[x, y] = automataGrid[x, y].state;
+                previousStates[x, y] = automatonGrid[x, y].state;
             }
         }
-
-        generation++;
     }
 
-    int TotalLiveNeighbours(Cell currentCell)
+    int TotalLiveNeighbours(Cell currentCell, int[,] previousStates)
     {
         int liveNeighbours = 0;
 
@@ -372,7 +371,7 @@ public class AutomataManager : MonoBehaviour
             if(currentCell.neighbours[i] != null)
             {
                 // Check if the neighbour was alive in the last generation
-                if(shadowGrid[currentCell.neighbours[i].x, currentCell.neighbours[i].y] == 1)
+                if(previousStates[currentCell.neighbours[i].x, currentCell.neighbours[i].y] == 1)
                 {
                     liveNeighbours++;
                 }
@@ -380,5 +379,5 @@ public class AutomataManager : MonoBehaviour
         }
 
         return liveNeighbours;
-    }
+    }*/
 }
