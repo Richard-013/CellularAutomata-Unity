@@ -125,7 +125,7 @@ public class AutomataManager : MonoBehaviour
         {
             for(int y = 0; y < verticalSize; y++)
             {
-                automataGrid[x, y] = Instantiate<Cell>(prefabCell, this.transform);
+                automataGrid[x, y] = new Cell(x, y);
             }
         }
 
@@ -140,8 +140,6 @@ public class AutomataManager : MonoBehaviour
             for(int y = 0; y < verticalSize; y++)
             {
                 Cell currentCell = automataGrid[x, y];
-                currentCell.name = "Cell " + x + ", " + y;
-                currentCell.transform.position = new Vector3(x, y, -10);
                 int newState = Random.Range(0,2);
                 currentCell.UpdateState(newState);
                 shadowGrid[x, y] = newState;

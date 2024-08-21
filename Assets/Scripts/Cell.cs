@@ -1,6 +1,4 @@
-using UnityEngine;
-
-public class Cell : MonoBehaviour
+public class Cell
 {
     // 1 = Alive, 0 = Dead
     public int state = -1;
