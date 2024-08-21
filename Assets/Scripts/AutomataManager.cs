@@ -338,46 +338,5 @@ public class AutomataManager : MonoBehaviour
 
         // Tell the cell its neighbours
         currentCell.MooreNeighbours(neighbours);
-    } 
-
-    /*void RunGameOfLifeGeneration(Cell[,] automatonGrid, int[,] previousStates)
-    {
-        for(int x = 0; x < horizontalSize; x++)
-        {
-            for(int y = 0; y < verticalSize; y++)
-            {
-                Cell currentCell = automatonGrid[x, y];
-
-                currentCell.GameOfLifeGeneration(TotalLiveNeighbours(currentCell, previousStates));
-            }
-        }
-
-        for(int x = 0; x < horizontalSize; x++)
-        {
-            for(int y = 0; y < verticalSize; y++)
-            {
-                previousStates[x, y] = automatonGrid[x, y].state;
-            }
-        }
     }
-
-    int TotalLiveNeighbours(Cell currentCell, int[,] previousStates)
-    {
-        int liveNeighbours = 0;
-
-        for(int i = 0; i < numNeighbours; i++)
-        {
-            // Check if the neighbour exists
-            if(currentCell.neighbours[i] != null)
-            {
-                // Check if the neighbour was alive in the last generation
-                if(previousStates[currentCell.neighbours[i].x, currentCell.neighbours[i].y] == 1)
-                {
-                    liveNeighbours++;
-                }
-            }
-        }
-
-        return liveNeighbours;
-    }*/
 }
