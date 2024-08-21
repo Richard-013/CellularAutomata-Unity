@@ -1,48 +1,58 @@
 public class Cell
 {
+    public int x, y;
+
     // 1 = Alive, 0 = Dead
     public int state = -1;
 
     public bool changedState = true;
 
-    // von Neumann Neighbours
-    // Indexes: 0 = Top, 1 = Bottom, 2 = Left, 3 = Right
+    // Indexes
+    // 0 = Top, 1 = Bottom, 2 = Left, 3 = Right
     // 4 = TopLeft, 5 = TopRight, 6 = BottomLeft, 7 = BottomRight 
-    public int[][] neighbours;
+    public Cell[] neighbours;
 
-    void Awake()
+    public Cell(int xLocation)
     {
-        
+        x = xLocation;
     }
 
-    // Update is called once per frame
-    void Update()
+    public Cell(int xLocation, int yLocation)
     {
-        
+        x = xLocation;
+        y = yLocation;
     }
 
-    public void VonNeumannNeighbours(int[] top, int[] bottom, int[] left, int[] right)
+    public void SetLinearNeighbours(Cell[] newNeighbours)
     {
-        neighbours = new int[4][];
+        neighbours = new Cell[2];
 
-        neighbours[0] = top;
-        neighbours[1] = bottom;
-        neighbours[2] = left;
-        neighbours[3] = right;
+        neighbours[0] = newNeighbours[0];
+        neighbours[1] = newNeighbours[1];
     }
 
-    public void MooreNeighbours(int[] top, int[] bottom, int[] left, int[] right, int[] topLeft, int[] topRight, int[] bottomLeft, int[] bottomRight)
+    public void VonNeumannNeighbours(Cell[] newNeighbours)
     {
-        neighbours = new int[8][];
+        neighbours = new Cell[4];
 
-        neighbours[0] = top;
-        neighbours[1] = bottom;
-        neighbours[2] = left;
-        neighbours[3] = right;
-        neighbours[4] = topLeft;
-        neighbours[5] = topRight;
-        neighbours[6] = bottomLeft;
-        neighbours[7] = bottomRight;
+        neighbours[0] = newNeighbours[0];
+        neighbours[1] = newNeighbours[1];
+        neighbours[2] = newNeighbours[2];
+        neighbours[3] = newNeighbours[3];
+    }
+
+    public void MooreNeighbours(Cell[] newNeighbours)
+    {
+        neighbours = new Cell[8];
+
+        neighbours[0] = newNeighbours[0];
+        neighbours[1] = newNeighbours[1];
+        neighbours[2] = newNeighbours[2];
+        neighbours[3] = newNeighbours[3];
+        neighbours[4] = newNeighbours[4];
+        neighbours[5] = newNeighbours[5];
+        neighbours[6] = newNeighbours[6];
+        neighbours[7] = newNeighbours[7];
     }
 
     // Mark if the state changed in the last cycle

@@ -2,13 +2,22 @@ using UnityEngine;
 
 public class AutomataManager : MonoBehaviour
 {
-    // References
-    public Cell prefabCell;
-    public Material aliveMaterial, deadMaterial;
+    const int LINEAR_NEIGHBOURS = 2;
+    const int VON_NEUMANN_NEIGHBOURS = 4;
+    const int MOORE_NEIGHBOURS = 8;
+
+    // Draw every n generations
+    const int GENERATION_DRAW_INTERVAL = 10;
+
+    // Set in Editor
+    public Material displayMaterial;
+
+    // Texture to apply to render automata on
+    Texture2D automatonTexture;
 
     // Grid size
-    public int horizontalSize = 50;
-    public int verticalSize = 50;
+    public int horizontalSize = 200;
+    public int verticalSize = 200;
 
     // Grid
     public Cell[,] automataGrid;
@@ -20,29 +29,21 @@ public class AutomataManager : MonoBehaviour
     private float time = 0.0f;
     public float interpolationPeriod = 0.5f;
 
-    const int VON_NEUMANN_NEIGHBOURS = 4;
-    const int MOORE_NEIGHBOURS = 8;
-
-    bool enableMooreMode = false;
+    
+    // Set neighbourhood type to use
+    // 0 = Moore, 1 = von Neumann, 2 = Linear
+    int neighbourhoodMode = 0;
     int numNeighbours;
 
+    // Initial board is alway Generation 0
     int generation = 0;
-
-    Texture2D automatonTexture;
-    public Material displayMaterial;
 
     void Awake()
     {
-        enableMooreMode = true;
-        SetNeighbourMode();
         SetupGrid();
-
         SetupTexture();
-
-        //UpdateMaterials();
     }
 
-    // Update is called once per frame
     void Update()
     {
         // Update how much time has passed since last frame
@@ -54,14 +55,10 @@ public class AutomataManager : MonoBehaviour
             time = time - interpolationPeriod;
             RunGameOfLifeGeneration();
             
-            /*
-            if(generation % 10 == 0)
+            if(generation % GENERATION_DRAW_INTERVAL == 0)
             {
-                UpdateMaterials();
+                UpdateTexture();
             }
-            */
-            //UpdateMaterials();
-            UpdateTexture();
         }
     }
 
@@ -86,7 +83,6 @@ public class AutomataManager : MonoBehaviour
         {
             // Convert array index into X, Y then retrieve cell state
             int state = shadowGrid[i % horizontalSize, i / verticalSize];
-            //Debug.Log("i: " + i + ", Co-Ordinates: " + (i % horizontalSize) + ", " + (i / verticalSize));
 
             if(state == 0)
             {
@@ -100,18 +96,6 @@ public class AutomataManager : MonoBehaviour
 
         automatonTexture.SetPixels(pixels);
         automatonTexture.Apply();
-    }
-
-    void SetNeighbourMode()
-    {
-        if(enableMooreMode)
-        {
-            numNeighbours = MOORE_NEIGHBOURS;
-        }
-        else
-        {
-            numNeighbours = VON_NEUMANN_NEIGHBOURS;
-        }
     }
 
     void SetupGrid()
@@ -151,221 +135,209 @@ public class AutomataManager : MonoBehaviour
 
     void SetupCellNeighbours(Cell currentCell, int x, int y)
     {
-        if(enableMooreMode)
+        if(neighbourhoodMode == 0)
         {
-            // Set the neighbours of the cell based on its grid position
-            int[] top, bottom, left, right, topLeft, topRight, bottomLeft, bottomRight;
-            
-            if(x == 0)
-            {
-                // If the cell is on the left edge, set no left neighbour
-                left = new int[2] {-1, -1}; // Null
-                right = new int[2] {x+1, y};
-
-                if(y == 0)
-                {
-                    // If the cell is on the bottom edge, set no bottom neighbours
-                    top = new int[2] {x, y+1};
-                    bottom = new int[2] {-1, -1}; // Null
-
-                    topLeft = new int[2] {-1, -1}; // Null
-                    bottomLeft = new int[2] {-1, -1}; // Null
-                    bottomRight = new int[2] {-1, -1}; // Null
-                    topRight = new int[2] {x+1, y+1};
-                }
-                else if(y == verticalSize-1)
-                {
-                    // If the cell is on the top edge, set no top neighbours
-                    top = new int[2] {-1, -1}; // Null
-                    bottom = new int[2] {x, y-1};
-
-                    topLeft = new int[2] {-1, -1}; // Null
-                    bottomLeft = new int[2] {-1, -1}; // Null
-                    bottomRight = new int[2] {x+1, y-1};
-                    topRight = new int[2] {-1, -1}; // Null
-                }
-                else
-                {
-                    // Set remaining neighbours
-                    top = new int[2] {x, y+1};
-                    bottom = new int[2] {x, y-1};
-
-                    topLeft = new int[2] {-1, -1}; // Null
-                    bottomLeft = new int[2] {-1, -1}; // Null
-                    bottomRight = new int[2] {x+1, y-1};
-                    topRight = new int[2] {x+1, y+1};
-                }
-            }
-            else if(x == horizontalSize-1)
-            {
-                // If the cell is on the right edge, set no right neighbour
-                left = new int[2] {x-1, y};
-                right = new int[2] {-1, -1}; // Null
-
-                if(y == 0)
-                {
-                    // If the cell is on the bottom edge, set no bottom neighbours
-                    top = new int[2] {x, y+1};
-                    bottom = new int[2] {-1, -1}; // Null
-
-                    topLeft = new int[2] {x-1, y+1};
-                    bottomLeft = new int[2] {-1, -1}; // Null
-                    bottomRight = new int[2] {-1, -1}; // Null
-                    topRight = new int[2] {-1, -1}; // Null
-                }
-                else if(y == verticalSize-1)
-                {
-                    // If the cell is on the top edge, set no top neighbours
-                    top = new int[2] {-1, -1}; // Null
-                    bottom = new int[2] {x, y-1};
-
-                    topLeft = new int[2] {-1, -1}; // Null
-                    bottomLeft = new int[2] {x-1, y-1};
-                    bottomRight = new int[2] {-1, -1}; // Null
-                    topRight = new int[2] {-1, -1}; // Null
-                }
-                else
-                {
-                    // Set remaining neighbours
-                    top = new int[2] {x, y+1};
-                    bottom = new int[2] {x, y-1};
-
-                    topLeft = new int[2] {x-1, y+1};
-                    bottomLeft = new int[2] {x-1, y-1};
-                    bottomRight = new int[2] {-1, -1}; // Null
-                    topRight = new int[2] {-1, -1}; // Null
-                }
-            }
-            else
-            {
-                left = new int[2] {x-1, y};
-                right = new int[2] {x+1, y};
-
-                if(y == 0)
-                {
-                    // If the cell is on the bottom edge, set no bottom neighbours
-                    top = new int[2] {x, y+1};
-                    bottom = new int[2] {-1, -1}; // Null
-                    
-                    topLeft = new int[2] {x-1, y+1};
-                    bottomLeft = new int[2] {-1, -1}; // Null
-                    bottomRight = new int[2] {-1, -1}; // Null
-                    topRight = new int[2] {x+1, y+1};
-                }
-                else if(y == verticalSize-1)
-                {
-                    // If the cell is on the top edge, set no top neighbours
-                    top = new int[2] {-1, -1}; // Null
-                    bottom = new int[2] {x, y-1};
-
-                    topLeft = new int[2] {-1, -1}; // Null
-                    bottomLeft = new int[2] {x-1, y-1};
-                    bottomRight = new int[2] {x+1, y-1};
-                    topRight = new int[2] {-1, -1}; // Null
-                }
-                else
-                {
-                    // Set remaining neighbours
-                    top = new int[2] {x, y+1};
-                    bottom = new int[2] {x, y-1};
-                    
-                    topLeft = new int[2] {x-1, y+1};
-                    bottomLeft = new int[2] {x-1, y-1};
-                    bottomRight = new int[2] {x+1, y-1};
-                    topRight = new int[2] {x+1, y+1};
-                }
-            }
-
-            // Tell the cell its neighbours
-            currentCell.MooreNeighbours(top, bottom, left, right, topLeft, topRight, bottomLeft, bottomRight);
+            numNeighbours = MOORE_NEIGHBOURS;
+            SetMooreNeighbours(currentCell, x, y);
+        }
+        else if(neighbourhoodMode == 1)
+        {
+            numNeighbours = VON_NEUMANN_NEIGHBOURS;
+            SetVonNeumannNeighbours(currentCell, x, y);
         }
         else
         {
-            // Set the neighbours of the cell based on its grid position
-            int[] top, bottom, left, right;
-            
-            if(x == 0)
+            numNeighbours = LINEAR_NEIGHBOURS;
+            SetLinearNeighbours(currentCell, x);
+        }
+    }
+
+    void SetLinearNeighbours(Cell currentCell, int x)
+    {
+        // Indexes
+        // 0 = Left, 1 = Right
+        Cell[] neighbours = new Cell[numNeighbours];
+
+        if(x == 0) // If the cell is on the left edge, set no left neighbour
+        {
+            neighbours[0] = null;
+            neighbours[1] = automataGrid[currentCell.x+1, 0];
+        }
+        else if(x == horizontalSize-1) // If the cell is on the right edge, set no right neighbour
+        {
+            neighbours[0] = automataGrid[currentCell.x-1, 0];
+            neighbours[1] = null;
+        }
+        else // If the cell is not on the left or right edge set both neighbours
+        {
+            neighbours[0] = automataGrid[currentCell.x-1, 0];
+            neighbours[1] = automataGrid[currentCell.x+1, 0];
+        }
+    }
+
+    void SetVonNeumannNeighbours(Cell currentCell, int x, int y)
+    {
+        // Indexes
+        // 0 = Top, 1 = Bottom, 2 = Left, 3 = Right
+        Cell[] neighbours = new Cell[numNeighbours];
+        
+        if(x == 0) // If the cell is on the left edge, set no left neighbour
+        {
+            neighbours[2] = null;
+            neighbours[3] = automataGrid[currentCell.x+1, currentCell.y];
+        }
+        else if(x == horizontalSize-1) // If the cell is on the right edge, set no right neighbour
+        {
+            neighbours[2] = automataGrid[currentCell.x-1, currentCell.y];
+            neighbours[3] = null;
+        }
+        else
+        {
+            neighbours[2] = automataGrid[currentCell.x-1, currentCell.y];
+            neighbours[3] = automataGrid[currentCell.x+1, currentCell.y];
+        }
+
+        if(y == 0) // If the cell is on the bottom edge, set no bottom neighbour
+        {
+            neighbours[0] = automataGrid[currentCell.x, currentCell.y+1];
+            neighbours[1] = null;
+        }
+        else if(y == verticalSize-1) // If the cell is on the top edge, set no top neighbour
+        {
+            neighbours[0] = null;
+            neighbours[1] = automataGrid[currentCell.x, currentCell.y-1];
+        }
+        else
+        {
+            neighbours[0] = automataGrid[currentCell.x, currentCell.y+1];
+            neighbours[1] = automataGrid[currentCell.x, currentCell.y-1];
+        }
+
+        // Tell the cell its neighbours
+        currentCell.VonNeumannNeighbours(neighbours);
+    }
+
+    void SetMooreNeighbours(Cell currentCell, int x, int y)
+    {
+        // Indexes
+        // 0 = Top, 1 = Bottom, 2 = Left, 3 = Right
+        // 4 = TopLeft, 5 = TopRight, 6 = BottomLeft, 7 = BottomRight
+        Cell[] neighbours = new Cell[numNeighbours];
+        
+        if(x == 0) // If the cell is on the left edge, set no left neighbours
+        {
+            neighbours[2] = null;
+            neighbours[3] = automataGrid[currentCell.x+1, currentCell.y];
+
+            if(y == 0) // If the cell is on the bottom edge, set no bottom neighbours
             {
-                // If the cell is on the left edge, set no left neighbour
-                left = new int[2] {-1, -1}; // Null
-                right = new int[2] {x+1, y};
+                neighbours[0] = automataGrid[currentCell.x, currentCell.y+1];
+                neighbours[1] = null;
+
+                neighbours[4] = null;
+                neighbours[6] = null;
+                neighbours[7] = null;
+                neighbours[5] = automataGrid[currentCell.x+1, currentCell.y+1];
             }
-            else if(x == horizontalSize-1)
+            else if(y == verticalSize-1) // If the cell is on the top edge, set no top neighbours
             {
-                // If the cell is on the right edge, set no right neighbour
-                left = new int[2] {x-1, y};
-                right = new int[2] {-1, -1}; // Null
+                neighbours[0] = null;
+                neighbours[1] = automataGrid[currentCell.x, currentCell.y-1];
+
+                neighbours[4] = null;
+                neighbours[6] = null;
+                neighbours[7] = automataGrid[currentCell.x+1, currentCell.y-1];
+                neighbours[5] = null;
             }
-            else
+            else // If the cell is not on the top or bottom edge
             {
-                left = new int[2] {x-1, y};
-                right = new int[2] {x+1, y};
+                neighbours[0] = automataGrid[currentCell.x, currentCell.y+1];
+                neighbours[1] = automataGrid[currentCell.x, currentCell.y-1];
+
+                neighbours[4] = null;
+                neighbours[6] = null;
+                neighbours[7] = automataGrid[currentCell.x+1, currentCell.y-1];
+                neighbours[5] = automataGrid[currentCell.x+1, currentCell.y+1];
             }
+        }
+        else if(x == horizontalSize-1) // If the cell is on the right edge, set no right neighbour
+        {
+            neighbours[2] = automataGrid[currentCell.x-1, currentCell.y];
+            neighbours[3] = null;
+
+            if(y == 0) // If the cell is on the bottom edge, set no bottom neighbours
+            {
+                neighbours[0] = automataGrid[currentCell.x, currentCell.y+1];
+                neighbours[1] = null;
+
+                neighbours[4] = automataGrid[currentCell.x-1, currentCell.y+1];
+                neighbours[6] = null;
+                neighbours[7] = null;
+                neighbours[5] = null;
+            }
+            else if(y == verticalSize-1) // If the cell is on the top edge, set no top neighbours
+            {
+                neighbours[0] = null;
+                neighbours[1] = automataGrid[currentCell.x, currentCell.y-1];
+
+                neighbours[4] = null;
+                neighbours[6] = automataGrid[currentCell.x-1, currentCell.y-1];
+                neighbours[7] = null;
+                neighbours[5] = null;
+            }
+            else // If the cell is not on the top or bottom edge
+            {
+                neighbours[0] = automataGrid[currentCell.x, currentCell.y+1];
+                neighbours[1] = automataGrid[currentCell.x, currentCell.y-1];
+
+                neighbours[4] = automataGrid[currentCell.x-1, currentCell.y+1];
+                neighbours[6] = automataGrid[currentCell.x-1, currentCell.y-1];
+                neighbours[7] = null;
+                neighbours[5] = null;
+            }
+        }
+        else // If the cell is not on the left or right edge
+        {
+            neighbours[2] = automataGrid[currentCell.x-1, currentCell.y];
+            neighbours[3] = automataGrid[currentCell.x+1, currentCell.y];
 
             if(y == 0)
             {
-                // If the cell is on the bottom edge, set no bottom neighbour
-                top = new int[2] {x, y+1};
-                bottom = new int[2] {-1, -1}; // Null
+                // If the cell is on the bottom edge, set no bottom neighbours
+                neighbours[0] = automataGrid[currentCell.x, currentCell.y+1];
+                neighbours[1] = null;
+                
+                neighbours[4] = automataGrid[currentCell.x-1, currentCell.y+1];
+                neighbours[6] = null;
+                neighbours[7] = null;
+                neighbours[5] = automataGrid[currentCell.x+1, currentCell.y+1];
             }
             else if(y == verticalSize-1)
             {
-                // If the cell is on the top edge, set no top neighbour
-                top = new int[2] {-1, -1}; // Null
-                bottom = new int[2] {x, y-1};
-            }
-            else
-            {
-                top = new int[2] {x, y+1};
-                bottom = new int[2] {x, y-1};
-            }
+                // If the cell is on the top edge, set no top neighbours
+                neighbours[0] = null;
+                neighbours[1] = automataGrid[currentCell.x, currentCell.y-1];
 
-            // Tell the cell its neighbours
-            currentCell.VonNeumannNeighbours(top, bottom, left, right);
-        }
-    }
-
-    // Randomise the state of all cells in the grid
-    void RandomiseState()
-    {
-        for(int x = 0; x < horizontalSize; x++)
-        {
-            for(int y = 0; y < verticalSize; y++)
+                neighbours[4] = null;
+                neighbours[6] = automataGrid[currentCell.x-1, currentCell.y-1];
+                neighbours[7] = automataGrid[currentCell.x+1, currentCell.y-1];
+                neighbours[5] = null;
+            }
+            else // If the cell is not on the top or bottom edge, set all neighbours
             {
-                int newState = Random.Range(0,2);
-                automataGrid[x, y].UpdateState(newState);
-                shadowGrid[x, y] = newState;
+                neighbours[0] = automataGrid[currentCell.x, currentCell.y+1];
+                neighbours[1] = automataGrid[currentCell.x, currentCell.y-1];
+                
+                neighbours[4] = automataGrid[currentCell.x-1, currentCell.y+1];
+                neighbours[6] = automataGrid[currentCell.x-1, currentCell.y-1];
+                neighbours[7] = automataGrid[currentCell.x+1, currentCell.y-1];
+                neighbours[5] = automataGrid[currentCell.x+1, currentCell.y+1];
             }
         }
-    }
 
-    // Update the material of each Cell to match its state
-    void UpdateMaterials()
-    {
-        for(int x = 0; x < horizontalSize; x++)
-        {
-            for(int y = 0; y < verticalSize; y++)
-            {
-                Cell currentCell = automataGrid[x, y];
-
-                // Only update the material if state changed
-                if(currentCell.changedState)
-                {
-                    if(currentCell.state == 1)
-                    {
-                        currentCell.GetComponent<Renderer>().material = aliveMaterial;
-                    }
-                    else
-                    {
-                        currentCell.GetComponent<Renderer>().material = deadMaterial;
-                    }
-
-                    // Tell the cell the material has been updated to match the state
-                    currentCell.UpdatedMaterial();
-                }
-            }
-        }
-    }
+        // Tell the cell its neighbours
+        currentCell.MooreNeighbours(neighbours);
+    } 
 
     void RunGameOfLifeGeneration()
     {
@@ -396,14 +368,11 @@ public class AutomataManager : MonoBehaviour
 
         for(int i = 0; i < numNeighbours; i++)
         {
+            // Check if the neighbour exists
             if(currentCell.neighbours[i] != null)
             {
-                if(currentCell.neighbours[i][0] == -1)
-                {
-                    continue;
-                }
-
-                if(shadowGrid[currentCell.neighbours[i][0], currentCell.neighbours[i][1]] == 1)
+                // Check if the neighbour was alive in the last generation
+                if(shadowGrid[currentCell.neighbours[i].x, currentCell.neighbours[i].y] == 1)
                 {
                     liveNeighbours++;
                 }
