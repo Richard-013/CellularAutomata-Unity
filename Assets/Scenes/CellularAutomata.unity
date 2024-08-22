@@ -507,7 +507,7 @@ MonoBehaviour:
   horizontalSize: 200
   verticalSize: 200
   interpolationPeriod: 0.1
-  automataMode: 1
+  automataMode: 2
 --- !u!4 &1858791834
 Transform:
   m_ObjectHideFlags: 0

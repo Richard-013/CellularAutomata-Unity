@@ -61,25 +61,8 @@ public class AutomataManager : MonoBehaviour
         if (time >= interpolationPeriod)
         {
             time = time - interpolationPeriod;
-            
-            switch(automataMode)
-            {
-                case 0:
-                    GameOfLife.RunGameOfLifeGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
-                    break;
-                case 1:
-                    Seeds.RunSeedsGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
-                    break;
-                case 2:
-                    BriansBrain.RunBriansBrainGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
-                    break;
-                default:
-                    GameOfLife.RunGameOfLifeGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
-                    break;
-            }
-            
-            
-            
+
+            CellularAutomata.RunAutomatonGeneration(automataMode, automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
             generation++;
             
             if(generation % GENERATION_DRAW_INTERVAL == 0)
