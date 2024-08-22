@@ -35,12 +35,34 @@ public class ElementaryAutomataManager : MonoBehaviour
 
     void Awake()
     {
+        if(ruleSet < 0)
+        {
+            ruleSet = 0;
+        }
+        else if(ruleSet > 256)
+        {
+            ruleSet = 255;
+        }
+
         SetupGrid();
         SetupTexture();
     }
 
     void Update()
     {
+        if(generation < verticalSize)
+        {
+            // Update how much time has passed since last frame
+            time += Time.deltaTime;
+
+            // If enough time has passed, update the grid
+            if (time >= interpolationPeriod)
+            {
+                time = time - interpolationPeriod;
+                ElementaryAutomata.RunElementaryAutomatonGeneration(automataGrid, shadowGrid, horizontalSize, ruleSet);
+                UpdateTexture();
+            }
+        }
     }
 
     void SetupTexture()
