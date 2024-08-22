@@ -28,6 +28,7 @@ public class AutomataManager : MonoBehaviour
 
     // Shadow Grid of current states
     int[,] shadowGrid;
+    int[,] shadowInfectionGrid;
 
     // Time tracking
     private float time = 0.0f;
@@ -35,7 +36,7 @@ public class AutomataManager : MonoBehaviour
 
     // Select Cellular Automata
     // Index
-    // 0 = Game of Life, 1 = Seeds
+    // 0 = Game of Life, 1 = Seeds, 2 = Brian's Brain, 3 = Belosouv-Zhabotinsky
     public int automataMode = 0;
 
     // Set neighbourhood type to use
@@ -45,6 +46,11 @@ public class AutomataManager : MonoBehaviour
 
     // Initial board is alway Generation 0
     int generation = 0;
+
+    // Infection rate for Belosouv-Zhabotinsky Reaction
+    public int infectivity = 15;
+    int initialInfectionAmount = 20;
+    int infectionChance = 10;
 
     void Awake()
     {
@@ -62,7 +68,7 @@ public class AutomataManager : MonoBehaviour
         {
             time = time - interpolationPeriod;
 
-            CellularAutomata.RunAutomatonGeneration(automataMode, automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
+            CellularAutomata.RunAutomatonGeneration(automataMode, automataGrid, shadowGrid, shadowInfectionGrid, horizontalSize, verticalSize, numNeighbours, infectivity);
             generation++;
             
             if(generation % GENERATION_DRAW_INTERVAL == 0)
@@ -84,10 +90,13 @@ public class AutomataManager : MonoBehaviour
 
     void UpdateTexture()
     {
-        Color[] pixels = automatonTexture.GetPixels();
+        if(automataMode == 3)
+        {
+            UpdateTextureInfection();
+            return;
+        }
 
-        Color deadColour = new Color(0.2415f, 0.2415f, 0.2415f, 1f);
-        Color aliveColour = new Color(0.3745f, 0.6843f, 0.8372f, 1f);
+        Color[] pixels = automatonTexture.GetPixels();
 
         for (int i = 0; i < pixels.Length; i++)
         {
@@ -118,11 +127,61 @@ public class AutomataManager : MonoBehaviour
         automatonTexture.Apply();
     }
 
+    void UpdateTextureInfection()
+    {
+        /*Gradient infectionGradient = new Gradient();
+        GradientColorKey[] gradientColours = new GradientColorKey[2];
+
+        gradientColours[0] = new GradientColorKey(aliveColour, 0f);
+        gradientColours[1] = new GradientColorKey(dyingColour, 1f);
+
+        GradientAlphaKey[] gradientAlphas = new GradientAlphaKey[2];
+        gradientAlphas[0] = new GradientAlphaKey(1.0f, 0.0f);
+        gradientAlphas[1] = new GradientAlphaKey(1.0f, 1.0f);
+
+        infectionGradient.SetKeys(gradientColours, gradientAlphas);*/
+
+        Color[] pixels = automatonTexture.GetPixels();
+
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            int state = shadowGrid[i % horizontalSize, i / verticalSize];
+
+            if(state == 0)
+            {
+                pixels[i] = aliveColour;
+            }
+            else if(state == 2)
+            {
+                pixels[i] = dyingColour;
+            }
+            else
+            {
+                if(shadowInfectionGrid[i % horizontalSize, i / verticalSize] < 50)
+                {
+                    pixels[i] = new Color(1f, 1f, 1f, 1f);
+                }
+                else
+                {
+                    pixels[i] = deadColour;
+                }
+            }
+        }
+
+        automatonTexture.SetPixels(pixels);
+        automatonTexture.Apply();
+    }
+
     void SetupGrid()
     {
         // Initialise the grid
         automataGrid = new Cell[horizontalSize, verticalSize];
         shadowGrid = new int[horizontalSize, verticalSize];
+
+        if(automataMode == 3)
+        {
+            shadowInfectionGrid = new int[horizontalSize, verticalSize];
+        }
 
         // Add a Cell instance to every grid cell
         for(int x = 0; x < horizontalSize; x++)
@@ -144,6 +203,9 @@ public class AutomataManager : MonoBehaviour
             case 2:
                 SetupCellsCentral();
                 break;
+            case 3:
+                SetupCellsRandomInfection();
+                break;
             default:
                 SetupCellsRandom();
                 break;
@@ -159,9 +221,46 @@ public class AutomataManager : MonoBehaviour
             for(int y = 0; y < verticalSize; y++)
             {
                 Cell currentCell = automataGrid[x, y];
-                int newState = Random.Range(0,2);
+                int newState = Random.Range(0, 2);
                 currentCell.UpdateState(newState);
                 shadowGrid[x, y] = newState;
+
+                if(automataMode == 3)
+                {
+                    shadowInfectionGrid[x, y] = currentCell.infection;
+                }
+
+                SetupCellNeighbours(currentCell, x, y);
+            }
+        }
+    }
+
+    void SetupCellsRandomInfection()
+    {
+        for(int x = 0; x < horizontalSize; x++)
+        {
+            for(int y = 0; y < verticalSize; y++)
+            {
+                Cell currentCell = automataGrid[x, y];
+
+                int chance = Random.Range(0, 100);
+                int newState = 0;
+                int currentInfection = 0;
+
+                if(chance < infectionChance) // Cell starts infected
+                {
+                    currentInfection = initialInfectionAmount;
+                    newState = 1;
+                }
+                else // Cell is not infected
+                {
+                    currentCell.infection = 0;
+                }
+
+                currentCell.infection = currentInfection;
+                currentCell.UpdateState(newState);
+                shadowGrid[x, y] = newState;
+                shadowInfectionGrid[x, y] = currentInfection;
 
                 SetupCellNeighbours(currentCell, x, y);
             }

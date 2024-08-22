@@ -3,7 +3,14 @@ public class Cell
     public int x, y;
 
     // 1 = Alive, 0 = Dead, 2 = Dying
+    // Belosouv-Zhabotinsky: // 0 = Healthy, 1 = Infected, 2 = Ill
     public int state = -1;
+
+    // Amount of infection in a cell
+    public int infection = 0;
+
+    public int resistanceInfection = 1;
+    public int resistanceIllness = 1;
 
     public bool changedState = true;
 
@@ -109,6 +116,36 @@ public class Cell
         else if(state == 1)
         {
             UpdateState(2);
+        }
+        else
+        {
+            UpdateState(0);
+        }
+    }
+
+    public void BelosouvZhabotinskyGeneration(int infectionAmount)
+    {
+        // If cell is ill, it becomes healthy
+        if(state == 2)
+        {
+            UpdateState(0);
+            infection = 0;
+            return;
+        }
+
+        infection = infectionAmount;
+
+        // If inection reaches 100, cell becomes ill
+        if(infection >= 100)
+        {
+            UpdateState(2);
+        }
+        else if(infection > 0)
+        {
+            if(state == 0)
+            {
+                UpdateState(1);
+            }
         }
         else
         {
