@@ -506,7 +506,8 @@ MonoBehaviour:
   displayMaterial: {fileID: 2100000, guid: 390330553f7e7cf48963556b59142014, type: 2}
   horizontalSize: 200
   verticalSize: 200
-  interpolationPeriod: 0.05
+  interpolationPeriod: 0.1
+  automataMode: 1
 --- !u!4 &1858791834
 Transform:
   m_ObjectHideFlags: 0

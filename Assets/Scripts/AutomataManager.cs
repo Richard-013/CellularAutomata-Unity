@@ -16,6 +16,7 @@ public class AutomataManager : MonoBehaviour
 
     // Cell colors
     Color deadColour = new Color(0.2415f, 0.2415f, 0.2415f, 1f);
+    Color dyingColour = new Color(0.8372f, 0.3745f, 0.3745f, 1f);
     Color aliveColour = new Color(0.3745f, 0.6843f, 0.8372f, 1f);
 
     // Grid size
@@ -35,7 +36,7 @@ public class AutomataManager : MonoBehaviour
     // Select Cellular Automata
     // Index
     // 0 = Game of Life, 1 = Seeds
-    int automataMode = 0;
+    public int automataMode = 0;
 
     // Set neighbourhood type to use
     // 0 = Moore, 1 = von Neumann
@@ -47,7 +48,6 @@ public class AutomataManager : MonoBehaviour
 
     void Awake()
     {
-        automataMode = 1;
         SetupGrid();
         SetupTexture();
     }
@@ -69,6 +69,9 @@ public class AutomataManager : MonoBehaviour
                     break;
                 case 1:
                     Seeds.RunSeedsGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
+                    break;
+                case 2:
+                    BriansBrain.RunBriansBrainGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
                     break;
                 default:
                     GameOfLife.RunGameOfLifeGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
@@ -118,6 +121,10 @@ public class AutomataManager : MonoBehaviour
                     // Alive cell
                     pixels[i] = aliveColour;
                     break;
+                case 2:
+                    // Dying cell
+                    pixels[i] = dyingColour;
+                    break;
                 default:
                     pixels[i] = deadColour;
                     break;
@@ -149,6 +156,9 @@ public class AutomataManager : MonoBehaviour
                 SetupCellsRandom();
                 break;
             case 1:
+                SetupCellsCentral();
+                break;
+            case 2:
                 SetupCellsCentral();
                 break;
             default:
@@ -186,9 +196,9 @@ public class AutomataManager : MonoBehaviour
                 Cell currentCell = automataGrid[x, y];
                 int newState = 0;
                 
-                if(x >= ((horizontalSize/2) - (horizontalSize*0.01)) && x <= ((horizontalSize/2) + (horizontalSize*0.01)))
+                if(x >= ((horizontalSize/2)-2) && x <= ((horizontalSize/2)+2))
                 {
-                    if(y >= ((verticalSize/2) - (verticalSize*0.01)) && y <= ((verticalSize/2) + (verticalSize*0.01)))
+                    if(y >= ((verticalSize/2)-1) && y <= ((verticalSize/2)+1))
                     {
                         newState = Random.Range(0,2);
                     }

@@ -2,7 +2,7 @@ public class Cell
 {
     public int x, y;
 
-    // 1 = Alive, 0 = Dead
+    // 1 = Alive, 0 = Dead, 2 = Dying
     public int state = -1;
 
     public bool changedState = true;
@@ -93,6 +93,22 @@ public class Cell
         if(currentLiveNeighbours == 2)
         {
             UpdateState(1);
+        }
+        else
+        {
+            UpdateState(0);
+        }
+    }
+
+    public void BriansBrainGeneration(int currentLiveNeighbours)
+    {
+        if(currentLiveNeighbours == 2)
+        {
+            UpdateState(1);
+        }
+        else if(state == 1)
+        {
+            UpdateState(2);
         }
         else
         {
