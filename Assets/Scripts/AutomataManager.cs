@@ -34,8 +34,8 @@ public class AutomataManager : MonoBehaviour
 
     // Select Cellular Automata
     // Index
-    // 0 = Game of Life
-    // int automataMode = 0;
+    // 0 = Game of Life, 1 = Seeds
+    int automataMode = 0;
 
     // Set neighbourhood type to use
     // 0 = Moore, 1 = von Neumann
@@ -47,7 +47,7 @@ public class AutomataManager : MonoBehaviour
 
     void Awake()
     {
-        // automataMode = 1;
+        automataMode = 1;
         SetupGrid();
         SetupTexture();
     }
@@ -61,7 +61,22 @@ public class AutomataManager : MonoBehaviour
         if (time >= interpolationPeriod)
         {
             time = time - interpolationPeriod;
-            GameOfLife.RunGameOfLifeGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
+            
+            switch(automataMode)
+            {
+                case 0:
+                    GameOfLife.RunGameOfLifeGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
+                    break;
+                case 1:
+                    Seeds.RunSeedsGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
+                    break;
+                default:
+                    GameOfLife.RunGameOfLifeGeneration(automataGrid, shadowGrid, horizontalSize, verticalSize, numNeighbours);
+                    break;
+            }
+            
+            
+            
             generation++;
             
             if(generation % GENERATION_DRAW_INTERVAL == 0)
@@ -93,13 +108,19 @@ public class AutomataManager : MonoBehaviour
             // Convert array index into X, Y then retrieve cell state
             int state = shadowGrid[i % horizontalSize, i / verticalSize];
 
-            if(state == 0)
+            switch(state)
             {
-                pixels[i] = deadColour;
-            }
-            else
-            {
-                pixels[i] = aliveColour;
+                case 0:
+                    // Dead cell
+                    pixels[i] = deadColour;
+                    break;
+                case 1:
+                    // Alive cell
+                    pixels[i] = aliveColour;
+                    break;
+                default:
+                    pixels[i] = deadColour;
+                    break;
             }
         }
 
@@ -122,11 +143,23 @@ public class AutomataManager : MonoBehaviour
             }
         }
 
-        SetupCell();
+        switch(automataMode)
+        {
+            case 0:
+                SetupCellsRandom();
+                break;
+            case 1:
+                SetupCellsCentral();
+                break;
+            default:
+                SetupCellsRandom();
+                break;
+        }
     }
 
     // Set the properties of each Cell
-    void SetupCell()
+    // Give every cell a random state
+    void SetupCellsRandom()
     {
         for(int x = 0; x < horizontalSize; x++)
         {
@@ -134,6 +167,33 @@ public class AutomataManager : MonoBehaviour
             {
                 Cell currentCell = automataGrid[x, y];
                 int newState = Random.Range(0,2);
+                currentCell.UpdateState(newState);
+                shadowGrid[x, y] = newState;
+
+                SetupCellNeighbours(currentCell, x, y);
+            }
+        }
+    }
+
+    // Set the properties of each Cell
+    // Set up a cluster of central cells with random states
+    void SetupCellsCentral()
+    {
+        for(int x = 0; x < horizontalSize; x++)
+        {
+            for(int y = 0; y < verticalSize; y++)
+            {
+                Cell currentCell = automataGrid[x, y];
+                int newState = 0;
+                
+                if(x >= ((horizontalSize/2) - (horizontalSize*0.01)) && x <= ((horizontalSize/2) + (horizontalSize*0.01)))
+                {
+                    if(y >= ((verticalSize/2) - (verticalSize*0.01)) && y <= ((verticalSize/2) + (verticalSize*0.01)))
+                    {
+                        newState = Random.Range(0,2);
+                    }
+                }
+                
                 currentCell.UpdateState(newState);
                 shadowGrid[x, y] = newState;
 

@@ -127,11 +127,11 @@ public class ElementaryAutomataManager : MonoBehaviour
             automataGrid[x] = new Cell(x);
         }
 
-        SetupCell();
+        SetupCells();
     }
 
     // Set the properties of each Cell
-    void SetupCell()
+    void SetupCells()
     {
         for(int x = 0; x < horizontalSize; x++)
         {

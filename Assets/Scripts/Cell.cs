@@ -87,4 +87,16 @@ public class Cell
             }
         }
     }
+
+    public void SeedsGeneration(int currentLiveNeighbours)
+    {
+        if(currentLiveNeighbours == 2)
+        {
+            UpdateState(1);
+        }
+        else
+        {
+            UpdateState(0);
+        }
+    }
 }
