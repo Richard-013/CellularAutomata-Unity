@@ -70,12 +70,6 @@ public class Cell
         }
     }
 
-    // Once the material has been updated, this information can be reset
-    public void UpdatedMaterial()
-    {
-        changedState = false;
-    }
-
     public void GameOfLifeGeneration(int currentLiveNeighbours)
     {
         if(state == 1)

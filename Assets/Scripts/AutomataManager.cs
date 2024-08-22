@@ -2,12 +2,11 @@ using UnityEngine;
 
 public class AutomataManager : MonoBehaviour
 {
-    const int LINEAR_NEIGHBOURS = 2;
     const int VON_NEUMANN_NEIGHBOURS = 4;
     const int MOORE_NEIGHBOURS = 8;
 
     // Draw every n generations
-    const int GENERATION_DRAW_INTERVAL = 5;
+    const int GENERATION_DRAW_INTERVAL = 1;
 
     // Set in Editor
     public Material displayMaterial;
@@ -15,24 +14,32 @@ public class AutomataManager : MonoBehaviour
     // Texture to apply to render automata on
     Texture2D automatonTexture;
 
+    // Cell colors
+    Color deadColour = new Color(0.2415f, 0.2415f, 0.2415f, 1f);
+    Color aliveColour = new Color(0.3745f, 0.6843f, 0.8372f, 1f);
+
     // Grid size
     public int horizontalSize = 200;
     public int verticalSize = 200;
 
     // Grid
-    public Cell[,] automataGrid;
+    Cell[,] automataGrid;
 
     // Shadow Grid of current states
-    public int[,] shadowGrid;
+    int[,] shadowGrid;
 
     // Time tracking
     private float time = 0.0f;
     public float interpolationPeriod = 0.5f;
 
-    
+    // Select Cellular Automata
+    // Index
+    // 0 = Game of Life
+    // int automataMode = 0;
+
     // Set neighbourhood type to use
-    // 0 = Moore, 1 = von Neumann, 2 = Linear
-    int neighbourhoodMode = 0;
+    // 0 = Moore, 1 = von Neumann
+    bool vonNeumannMode = false;
     int numNeighbours;
 
     // Initial board is alway Generation 0
@@ -40,6 +47,7 @@ public class AutomataManager : MonoBehaviour
 
     void Awake()
     {
+        // automataMode = 1;
         SetupGrid();
         SetupTexture();
     }
@@ -136,43 +144,15 @@ public class AutomataManager : MonoBehaviour
 
     void SetupCellNeighbours(Cell currentCell, int x, int y)
     {
-        if(neighbourhoodMode == 0)
-        {
-            numNeighbours = MOORE_NEIGHBOURS;
-            SetMooreNeighbours(currentCell, x, y);
-        }
-        else if(neighbourhoodMode == 1)
+        if(vonNeumannMode)
         {
             numNeighbours = VON_NEUMANN_NEIGHBOURS;
             SetVonNeumannNeighbours(currentCell, x, y);
         }
         else
         {
-            numNeighbours = LINEAR_NEIGHBOURS;
-            SetLinearNeighbours(currentCell, x);
-        }
-    }
-
-    void SetLinearNeighbours(Cell currentCell, int x)
-    {
-        // Indexes
-        // 0 = Left, 1 = Right
-        Cell[] neighbours = new Cell[numNeighbours];
-
-        if(x == 0) // If the cell is on the left edge, set no left neighbour
-        {
-            neighbours[0] = null;
-            neighbours[1] = automataGrid[currentCell.x+1, 0];
-        }
-        else if(x == horizontalSize-1) // If the cell is on the right edge, set no right neighbour
-        {
-            neighbours[0] = automataGrid[currentCell.x-1, 0];
-            neighbours[1] = null;
-        }
-        else // If the cell is not on the left or right edge set both neighbours
-        {
-            neighbours[0] = automataGrid[currentCell.x-1, 0];
-            neighbours[1] = automataGrid[currentCell.x+1, 0];
+            numNeighbours = MOORE_NEIGHBOURS;
+            SetMooreNeighbours(currentCell, x, y);
         }
     }
 
