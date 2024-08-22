@@ -36,12 +36,62 @@ public class ElementaryAutomataManager : MonoBehaviour
     void Awake()
     {
         SetupGrid();
+        SetupTexture();
     }
 
     void Update()
     {
     }
 
+    void SetupTexture()
+    {
+        automatonTexture = new Texture2D(horizontalSize, verticalSize, TextureFormat.RGB24, false);
+        automatonTexture.filterMode = FilterMode.Point;
+
+        Color[] pixels = automatonTexture.GetPixels();
+
+        // Blank the texture to dead cell colour
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            pixels[i] = deadColour;
+        }
+
+        automatonTexture.SetPixels(pixels);
+        automatonTexture.Apply();
+
+        UpdateTexture();
+        
+        displayMaterial.SetTexture("_BaseMap", automatonTexture);
+    }
+
+    void UpdateTexture()
+    {
+        Color[] pixels = automatonTexture.GetPixels();
+
+        // Draw from top of texture downwards
+        int startOfRow = verticalSize*(horizontalSize-(generation+1));
+
+        for (int i = startOfRow; i < startOfRow+horizontalSize; i++)
+        {
+            // Convert array index into X then retrieve cell state
+            int state = automataGrid[i % horizontalSize].state;
+
+            if(state == 0)
+            {
+                pixels[i] = deadColour;
+            }
+            else
+            {
+                pixels[i] = aliveColour;
+            }
+        }
+
+        automatonTexture.SetPixels(pixels);
+        automatonTexture.Apply();
+
+        // Increment generation as the current generation has been rendered
+        generation++;
+    }
 
     void SetupGrid()
     {
